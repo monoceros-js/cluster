@@ -8,7 +8,7 @@ const cluster = new Cluster()
 
 test('it should throw an error if entity does not exist', () => {
   expect(() => cluster.resolve('unknown')).toThrowError(
-    new MonocerosClusterError('Could not resolve celestial named "unknown"')
+    new MonocerosClusterError('Could not resolve entity named "unknown"')
   )
 })
 

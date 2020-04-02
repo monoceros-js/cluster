@@ -1,7 +1,8 @@
 {
   "name": "@monoceros/cluster",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Monoceros IOC container",
+  "main": "src/index.js",
   "author": "Folkert-Jan van der Pol <os@folkertjan.nl> (https://folkertjan.nl)",
   "license": "MIT",
   "scripts": {

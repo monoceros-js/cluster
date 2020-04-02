@@ -1,14 +1,14 @@
 import { isInfinite, isFunction } from './utils/value'
 import { MonocerosClusterError } from './errors'
 
-function Cluster(superCluster) {
-  this.superCluster = superCluster || Infinity
-  this.celestials = {}
+function Cluster(parent) {
+  this.parent = parent || Infinity
+  this.entities = {}
 
-  this.register = function(name, celestial, CelestialType, ...args) {
-    CelestialType = CelestialType || Cluster.Body
-    celestial = this.resolveDependencies(celestial, args)
-    this.celestials[name] = new CelestialType(celestial)
+  this.register = function(name, entity, EntityType, ...args) {
+    EntityType = EntityType || Cluster.Body
+    entity = this.resolveDependencies(entity, args)
+    this.entities[name] = new EntityType(entity)
   }
 
   this.createCluster = function() {
@@ -16,45 +16,42 @@ function Cluster(superCluster) {
   }
 
   this.resolve = function(name) {
-    if (this.celestials.hasOwnProperty(name)) {
-      return this.celestials[name].resolve()
+    if (this.entities.hasOwnProperty(name)) {
+      return this.entities[name].resolve()
     }
-    if (
-      isInfinite(this.superCluster) ||
-      !this.superCluster.celestials.hasOwnProperty(name)
-    ) {
+    if (isInfinite(this.parent) || !this.parent.entities.hasOwnProperty(name)) {
       throw new MonocerosClusterError(
-        `Could not resolve celestial named "${name}"`
+        `Could not resolve entity named "${name}"`
       )
     }
-    return this.superCluster.celestials[name].resolve()
+    return this.parent.entities[name].resolve()
   }
 
-  this.resolveDependencies = function(celestial, args) {
-    if (!isFunction(celestial) || !celestial.$dependencies) return celestial
-    const deps = celestial.$dependencies.map(dep => {
+  this.resolveDependencies = function(entity, args) {
+    if (!isFunction(entity) || !entity.$dependencies) return entity
+    const deps = entity.$dependencies.map(dep => {
       return this.resolve(dep)
     })
     deps.unshift({})
-    return celestial.bind.apply(celestial, deps.concat(args))
+    return entity.bind.apply(entity, deps.concat(args))
   }
 }
 
-Cluster.Body = function(celestial) {
-  this.resolve = () => celestial
+Cluster.Body = function(entity) {
+  this.resolve = () => entity
 }
 
-Cluster.Singleton = function(celestial) {
+Cluster.Singleton = function(entity) {
   let instance
 
   this.resolve = () => {
-    if (!instance) instance = celestial()
+    if (!instance) instance = entity()
     return instance
   }
 }
 
-Cluster.Instance = function(celestial) {
-  this.resolve = () => new celestial()
+Cluster.Instance = function(entity) {
+  this.resolve = () => new entity()
 }
 
 export default Cluster
