@@ -196,3 +196,14 @@ test('it should correctly resolve overwritten entities', () => {
 
   expect(cluster.resolve('test13').add(1, 2)).toBe(-1)
 })
+
+test('it should apply extra arguments passed to register to entity on resolve', () => {
+  const add = (a, b) => a + b
+
+  cluster.register('add', add)
+  cluster.register('three', add, {}, 1, 2)
+
+  expect(cluster.resolve('add', 1, 2)()).toBe(3)
+  expect(cluster.resolve('add')(1, 2)).toBe(3)
+  expect(cluster.resolve('three')('something', 'else')).toBe(3)
+})
