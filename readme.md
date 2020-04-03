@@ -99,7 +99,7 @@ const add = (a, b) => a + b
 cluster.register('three', add, {}, 1, 2)
 
 
-// cluster.resolve('three')    // 3
+// cluster.resolve('three')()   // 3
 ```
 
 ### Resolve
