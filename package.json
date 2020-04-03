@@ -14,7 +14,11 @@
     "lint:md": "remark ."
   },
   "keywords": [
-    "monoceros"
+    "monoceros",
+    "inversion of control",
+    "ioc",
+    "monoceros-js",
+    "cluster"
   ],
   "repository": {
     "type": "git",
