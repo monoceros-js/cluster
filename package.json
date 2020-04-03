@@ -1,6 +1,6 @@
 {
   "name": "@monoceros/cluster",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Monoceros IOC container",
   "main": "src/index.js",
   "author": "Folkert-Jan van der Pol <os@folkertjan.nl> (https://folkertjan.nl)",
@@ -9,7 +9,7 @@
     "pre-commit:msg": "echo 'Pre-commit checks...' && exit 0",
     "test": "npm run lint && jest",
     "build": "npm run build:md",
-    "build:md": "remark readme.md --use toc --output",
+    "build:md": "remark readme.md --output",
     "lint": "npm run lint:md",
     "lint:md": "remark ."
   },

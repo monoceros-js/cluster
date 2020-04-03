@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "listItemIndent": "1"
+  },
+  "plugins": {
+    "remark-toc": {
+      "tight": "true",
+      "maxDepth": "3"
+    }
+  }
+}

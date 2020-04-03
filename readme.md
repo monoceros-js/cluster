@@ -8,27 +8,18 @@ Monoceros IOC Container
 
 ## Table of contents
 
--   [Install](#install)
-
-    -   [NPM](#npm)
-
--   [Usage](#usage)
-
-    -   [Init](#init)
-
-    -   [Register](#register)
-
-    -   [Resolve](#resolve)
-
-        -   [Resolve with dependencies](#resolve-with-dependencies)
-
-    -   [Working with Superclusters](#working-with-superclusters)
-
--   [License](#license)
+- [Install](#install)
+  - [npm](#npm)
+- [Usage](#usage)
+  - [Init](#init)
+  - [Register](#register)
+  - [Resolve](#resolve)
+  - [Working with Superclusters](#working-with-superclusters)
+- [License](#license)
 
 ## Install
 
-### NPM
+### npm
 
 ```bash
 npm install @monoceros/cluster
