@@ -14,6 +14,7 @@
   - [Working with Superclusters](#working-with-superclusters)
 - [API](#api)
   - [Cluster](#cluster)
+  - [Register](#register-1)
   - [Resolve](#resolve-1)
   - [Types](#types)
 - [License](#license)
@@ -38,12 +39,15 @@ const cluster = new Cluster()
 
 ### Register
 
-You can register entities to the Cluster by calling `.register()` with a `name` and the `entity`.
+You can register entities to the Cluster by calling `.register()` with a _name_ and the _entity_.
 
 ```js
 const add = (a, b) => a + b
 
 cluster.register('add', add)
+
+
+// cluster.resolve('add')(1, 2)    // 3
 ```
 
 #### Register as type
@@ -53,11 +57,18 @@ You need to specifiy the entity type if you want something other than the defaul
 See [types](#types) for a list of possibilities
 
 ```js
-const current = {
+const current = () => ({
   version: Math.random()
-}
+})
 
 cluster.register('current', current, {type: Cluster.Singleton})
+
+
+// const one = cluster.resolve('current')
+// one.version    // 0.3345465634534234560654992
+
+// const two = cluster.resolve('current')
+// two.version    // 0.3345465634534234560654992
 ```
 
 #### Register dependencies
@@ -67,12 +78,15 @@ Functions / Classes depending on others have to pass a list of their dependency 
 _Note: dependencies can be registered in any order, as long as they are registered before resolving the dependend entity_
 
 ```js
-const dependency = (a, b) => a + b
+const add = (a, b) => a + b
 
-const dependend = (add, a, b, c) => add(a, b) * c
+const dependend = (d1, a, b, c) => d1(a, b) * c
 
-cluster.register('dependend', dependend, {dependencies: ['dependency']})
-cluster.register('dependency', dependency)
+cluster.register('dependend', dependend, {dependencies: ['add']})
+cluster.register('add', add)
+
+
+// cluster.resolve('dependend')(10, 1, 3)    // 33
 ```
 
 #### Register with arguments
@@ -83,6 +97,9 @@ Every argument after the first three arguments applied to `.register()` will be 
 const add = (a, b) => a + b
 
 cluster.register('three', add, {}, 1, 2)
+
+
+// cluster.resolve('three')    // 3
 ```
 
 ### Resolve
@@ -90,10 +107,25 @@ cluster.register('three', add, {}, 1, 2)
 You can get registered entities from the Cluster by calling `.resolve()` with the _name_ of the required entity.
 
 ```js
-// let's assume we registered entity 'add': const add = (a, b) => a + b
-const entity = cluster.resolve('add')
+// const add = (a, b) => a + b
+// cluster.register('add', add)
 
-entity(1, 2) // 3
+const resolved = cluster.resolve('add')
+
+resolved(1, 2) // 3
+```
+
+#### With arguments
+
+You can pass arguments to `.resolve`. These will automatically be applied to the entity to resolve.
+
+```js
+// const add = (a, b) => a + b
+// cluster.register('add', add)
+
+const resolved = cluster.resolve('add', 1, 2)
+
+resolved() // 3
 ```
 
 ### Working with Superclusters
@@ -109,9 +141,7 @@ const add = (a, b) => a + b
 
 parent.register('add', add)
 
-const entity = child.resolve('add')
-
-entity(1, 2) // 3
+child.resolve('add')(1, 2)    // 3
 ```
 
 * * *
@@ -130,17 +160,17 @@ new Cluster()
 
 Returns instance of Cluster
 
-#### Register
+### Register
 
 > (name, entity\[, options[, ...arguments]])
 
 ```js
-cluster.register(name, entity, options || null, ...args)
+cluster.register(name, entity, options || {}, ...args)
 ```
 
 Register new entity with name.
 
-- `name` <sup>(required)</sup> - Name to register entity under, resolves under same name
+- `name` <sup>(required)</sup> - Registration name, used by `.resolve()`
 
 - `entity` <sup>(required)</sup> - Entity to register
 
@@ -148,7 +178,7 @@ Register new entity with name.
 
   - `.type` <sup>(optional)</sup> - Register type entity will be resolved with. Accepted values: see [types](#types)
 
-  - `.dependencies` <sup>(optional)</sup> - Pass array of enitty names the current entity depends upon
+  - `.dependencies` <sup>(optional)</sup> - Array of entity names the current entity depends upon
 
 - `...args` <sup>(optional)</sup> - Any arguments you want a function / class entity to be called with upon calling resolve
 
@@ -168,11 +198,11 @@ Resolve registered entities.
 
 ### Types
 
-| Description | Type                | Resolves as                                                                 | Accepted entities                                 |
-| ----------- | ------------------- | --------------------------------------------------------------------------- | ------------------------------------------------- |
-| _default_   | `Cluster.Body`      | _as-is_                                                                     | `string`, `number`, `object`, `class`, `function` |
-| Singleton   | `Cluster.Singleton` | [singleton](https://en.wikipedia.org/wiki/Singleton_pattern)                | `object`                                          |
-| Instance    | `Cluster.Instance`  | class [instance](https://en.wikipedia.org/wiki/Instance_(computer_science)) | `class`, `constructor function`                   |
+| Description | Type                | Resolves                                                                    | Accepted entities                                                |
+| ----------- | ------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| _default_   | `Cluster.Body`      | _as-is_                                                                     | `string`, `number`, `object`, `function`, `constructor`, `class` |
+| Singleton   | `Cluster.Singleton` | [singleton](https://en.wikipedia.org/wiki/Singleton_pattern)                | `function`                                                       |
+| Instance    | `Cluster.Instance`  | class [instance](https://en.wikipedia.org/wiki/Instance_(computer_science)) | `constructor`, `class`                                           |
 
 * * *
 
