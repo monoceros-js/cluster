@@ -1,6 +1,6 @@
 require = require('esm')(module /*, options*/)
 
-const Cluster = require('../src/index.js').default
+const Cluster = require('../dist/monoceros-cluster.js').default
 const MonocerosClusterError = require('../src/errors/index.js')
   .MonocerosClusterError
 
@@ -28,7 +28,7 @@ test('it should resolve identical function after creating entity as function', (
 })
 
 test('it should resolve an instance after registering entity as instance', () => {
-  const entity = function() {
+  const entity = function () {
     this.name = 'instance of entity'
   }
   cluster.register('test3', entity, { type: Cluster.Instance })
@@ -49,7 +49,7 @@ test('it should resolve a singleton after registering entity as singleton', () =
 })
 
 test('it should take type as replacement for options object', () => {
-  const entity = function() {
+  const entity = function () {
     this.name = 'instance of entity'
   }
 
@@ -120,7 +120,7 @@ test('it should let clusters return requested entity from own entities if it is 
 })
 
 test('it should recursively resolve entity dependencies', () => {
-  const one = function() {
+  const one = function () {
     this.name = 'dependency one'
   }
 
@@ -129,11 +129,11 @@ test('it should recursively resolve entity dependencies', () => {
     return d3.name + ' ' + name
   }
 
-  const three = function() {
+  const three = function () {
     this.name = 'dependency three'
   }
 
-  const four = function(d1, d2, d3) {
+  const four = function (d1, d2, d3) {
     this.name = 'depends upon one, two and three'
     expect(d1.name).toBe('dependency one')
     expect(d2('test')).toBe('dependency three test')
@@ -155,16 +155,16 @@ test('it should recursively resolve entity dependencies', () => {
 })
 
 test('it should apply arguments that are not dependencies when registering an instance', () => {
-  const one = function(name) {
+  const one = function (name) {
     return 'hello ' + name
   }
 
-  const two = function(name) {
+  const two = function (name) {
     expect(name).toBe('monoceros')
     return name
   }
 
-  const three = function(d1, d2, argument) {
+  const three = function (d1, d2, argument) {
     this.greeting = `${d1(d2())}. passed: "${argument}"`
   }
 
