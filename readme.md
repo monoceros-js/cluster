@@ -13,9 +13,8 @@
   - [Resolve](#resolve)
   - [Working with Superclusters](#working-with-superclusters)
 - [API](#api)
-  - [`new Cluster()`](#new-cluster)
-  - [`.register(name, entity[[, options = {}][, ...args]])`](#registername-entity-options---args)
-  - [`.resolve(name[, ...args])`](#resolvename-args)
+  - [Cluster](#cluster)
+  - [Resolve](#resolve-1)
   - [Types](#types)
 - [License](#license)
 
@@ -123,15 +122,23 @@ entity(1, 2) // 3
 import Cluster from '@monoceros/cluster'
 ```
 
-### `new Cluster()`
+### Cluster
+
+```js
+new Cluster()
+```
 
 Returns instance of Cluster
 
-### `.register(name, entity[[, options = {}][, ...args]])`
+#### Register
+
+> (name, entity\[, options[, ...arguments]])
+
+```js
+cluster.register(name, entity, options || null, ...args)
+```
 
 Register new entity with name.
-
-Parameters:
 
 - `name` <sup>(required)</sup> - Name to register entity under, resolves under same name
 
@@ -145,11 +152,15 @@ Parameters:
 
 - `...args` <sup>(optional)</sup> - Any arguments you want a function / class entity to be called with upon calling resolve
 
-### `.resolve(name[, ...args])`
+### Resolve
 
-Resolve registered entites.
+> (name, [, ...arguments])
 
-Parameters: 
+```js
+cluster.resolve(name, ...args)
+```
+
+Resolve registered entities.
 
 - `name` <sup>(required)</sup> -- Name of registered entity to resolve
 
