@@ -17,6 +17,7 @@
   - [Register](#register-1)
   - [Resolve](#resolve-1)
   - [Types](#types)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Install
@@ -75,7 +76,7 @@ cluster.register('current', current, {type: Cluster.Singleton})
 
 Functions / Classes depending on others have to pass a list of their dependency names in the option parameter of `.register()`. 
 
-> **Note:** dependencies should be passed in the same order as their parameter ordder in the entity. _Dependencies should always be the first parameters of the entity_.
+> **Note:** dependencies should be passed in the same order as their parameter order in the entity. _Dependencies should always be the first parameters of the entity_.
 
 > **Note:** _entities_ can be registered in any order.
 
@@ -207,6 +208,10 @@ Resolve registered entities.
 | Instance    | `Cluster.Instance`  | class [instance](https://en.wikipedia.org/wiki/Instance_(computer_science)) | `constructor`, `class`                                           |
 
 * * *
+
+## Acknowledgements
+
+Cluster was inspired by [this article on dependency injection](https://krasimirtsonev.com/blog/article/Dependency-injection-in-JavaScript) by [krasimir](https://github.com/krasimir)
 
 ## License
 
