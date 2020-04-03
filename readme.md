@@ -75,7 +75,9 @@ cluster.register('current', current, {type: Cluster.Singleton})
 
 Functions / Classes depending on others have to pass a list of their dependency names in the option parameter of `.register()`. 
 
-_Note: dependencies can be registered in any order, as long as they are registered before resolving the dependend entity_
+> **Note:** dependencies should be passed in the same order as their parameter ordder in the entity. _Dependencies should always be the first parameters of the entity_.
+
+> **Note:** _entities_ can be registered in any order.
 
 ```js
 const add = (a, b) => a + b
