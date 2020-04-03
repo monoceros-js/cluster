@@ -108,9 +108,9 @@ test('it should recursively resolve entity dependencies', () => {
     this.name = 'dependency one'
   }
 
-  const DependencyTwo = function(dThree) {
+  const DependencyTwo = function(dThree, name) {
     expect(dThree.name).toBe('dependency three')
-    return dThree.name
+    return dThree.name + ' ' + name
   }
 
   DependencyTwo.$dependencies = ['test9_dependency_three']
@@ -122,7 +122,7 @@ test('it should recursively resolve entity dependencies', () => {
   const DependsUpon = function(dOne, dTwo) {
     this.name = 'depends upon one and two'
     expect(dOne.name).toBe('dependency one')
-    expect(dTwo()).toBe('dependency three')
+    expect(dTwo('test')).toBe('dependency three test')
   }
 
   DependsUpon.$dependencies = ['test9_dependency_one', 'test9_dependency_two']
