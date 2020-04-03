@@ -6,7 +6,7 @@ function Cluster(parent) {
   this.entities = {}
 
   this.register = function(name, entity, options, ...args) {
-    if (options && !options.type && !options.dependencies) {
+    if (options && isFunction(options)) {
       options = { type: options }
     }
     options = options || {}
@@ -14,7 +14,7 @@ function Cluster(parent) {
       $uninitialized: entity,
       $type: options.type || Cluster.Body,
       $dependencies: options.dependencies || entity.$dependencies || [],
-      $args: args || [],
+      $args: args && args.length > 0 ? args : [],
     }
   }
 
@@ -47,10 +47,15 @@ function Cluster(parent) {
   }
 
   this.resolveDependencies = function(entity, dependencies, args) {
-    if (!isFunction(entity) || dependencies.length === 0) return entity
-    const deps = dependencies.map(dep => {
-      return this.resolve(dep)
-    })
+    if (!isFunction(entity)) return entity
+    if (dependencies.length === 0 && args.length === 0) return entity
+
+    const deps = []
+    if (dependencies.length > 0) {
+      dependencies.forEach(dep => {
+        deps.push(this.resolve(dep))
+      })
+    }
     deps.unshift({})
     return entity.bind.apply(entity, deps.concat(args))
   }
