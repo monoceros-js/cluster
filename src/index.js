@@ -24,11 +24,9 @@ function Cluster(parent) {
 
   this.resolve = function(name, ...args) {
     if (this.entities.hasOwnProperty(name)) {
-      console.log('Found in self: ', name)
       return this.applyEntityType(name, args).resolve()
     }
     if (!isInfinite(this.parent) && this.parent.entities.hasOwnProperty(name)) {
-      console.log('Found in parent: ', name)
       return this.parent.applyEntityType(name, args).resolve()
     }
 
@@ -39,7 +37,6 @@ function Cluster(parent) {
     let entity = this.entities[name]
     const { $uninitialized, $type, $dependencies, $args } = entity
     if (!$uninitialized) return entity
-    console.log(entity)
     entity = this.resolveDependencies(
       $uninitialized,
       $dependencies,
