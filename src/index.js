@@ -5,7 +5,7 @@ function Cluster(parent) {
   this.parent = parent || Infinity
   this.entities = {}
 
-  this.register = function(name, entity, options, ...args) {
+  this.register = function (name, entity, options, ...args) {
     if (options && isFunction(options)) {
       options = { type: options }
     }
@@ -18,11 +18,12 @@ function Cluster(parent) {
     }
   }
 
-  this.createCluster = function() {
+  this.createCluster = function () {
     return new Cluster(this)
   }
 
-  this.resolve = function(name, ...args) {
+  this.resolve = function (name, ...args) {
+    args = args || []
     if (this.entities.hasOwnProperty(name)) {
       return this.applyEntityType(name, args).resolve()
     }
@@ -33,7 +34,7 @@ function Cluster(parent) {
     throw new MonocerosClusterError(`Could not resolve entity named "${name}"`)
   }
 
-  this.applyEntityType = function(name, args) {
+  this.applyEntityType = function (name, args) {
     let entity = this.entities[name]
     const { $uninitialized, $type, $dependencies, $args } = entity
     if (!$uninitialized) return entity
@@ -46,7 +47,7 @@ function Cluster(parent) {
     return this.entities[name]
   }
 
-  this.resolveDependencies = function(entity, dependencies, args) {
+  this.resolveDependencies = function (entity, dependencies, args) {
     if (!isFunction(entity)) return entity
     if (dependencies.length === 0 && args.length === 0) return entity
 
@@ -61,11 +62,11 @@ function Cluster(parent) {
   }
 }
 
-Cluster.Body = function(entity) {
+Cluster.Body = function (entity) {
   this.resolve = () => entity
 }
 
-Cluster.Singleton = function(entity) {
+Cluster.Singleton = function (entity) {
   let instance
 
   this.resolve = () => {
@@ -74,7 +75,7 @@ Cluster.Singleton = function(entity) {
   }
 }
 
-Cluster.Instance = function(entity) {
+Cluster.Instance = function (entity) {
   this.resolve = () => new entity()
 }
 

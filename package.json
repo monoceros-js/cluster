@@ -1,14 +1,15 @@
 {
   "name": "@monoceros/cluster",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Monoceros IOC container",
-  "main": "src/index.js",
   "author": "Folkert-Jan van der Pol <os@folkertjan.nl> (https://folkertjan.nl)",
   "license": "MIT",
-  "scripts": {
+  "main": "dist/monoceros-cluster.js",
+  "scrips": {
     "pre-commit:msg": "echo 'Pre-commit checks...' && exit 0",
     "test": "npm run lint && jest",
-    "build": "npm run build:md",
+    "build": "npm run build:module && npm run build:md",
+    "build:module": "rollup -c",
     "build:md": "remark readme.md --output",
     "lint": "npm run lint:md",
     "lint:md": "remark ."
@@ -29,7 +30,12 @@
     "jest": "^25.2.6",
     "pre-commit": "^1.2.2",
     "remark-cli": "^8.0.0",
-    "remark-toc": "^7.0.0"
+    "remark-toc": "^7.0.0",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "rollup": "^2.2.0",
+    "rollup-plugin-babel": "^4.4.0"
   },
   "pre-commit": {
     "run": [
