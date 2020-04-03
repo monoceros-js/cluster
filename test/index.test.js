@@ -42,7 +42,7 @@ test('it should return an instance after creating entity as Instance', () => {
   const entity = function() {
     this.name = 'instance of entity'
   }
-  cluster.register('test3_entity', entity, Cluster.Instance)
+  cluster.register('test3_entity', entity, { type: Cluster.Instance })
 
   expect(cluster.resolve('test3_entity').name).toBe('instance of entity')
 })
@@ -51,7 +51,7 @@ test('it should return a singleton after creating entity as Singleton', () => {
   const entity = () => ({
     id: Math.random(),
   })
-  cluster.register('test4_entity', entity, Cluster.Singleton)
+  cluster.register('test4_entity', entity, { type: Cluster.Singleton })
 
   const resultOne = cluster.resolve('test4_entity')
   const resultTwo = cluster.resolve('test4_entity')
@@ -112,29 +112,34 @@ test('it should recursively resolve entity dependencies', () => {
     expect(dThree.name).toBe('dependency three')
     return dThree.name + ' ' + name
   }
-
   DependencyTwo.$dependencies = ['test9_dependency_three']
 
   const DependencyThree = function() {
     this.name = 'dependency three'
   }
 
-  const DependsUpon = function(dOne, dTwo) {
-    this.name = 'depends upon one and two'
+  const DependsUpon = function(dOne, dTwo, dThree) {
+    this.name = 'depends upon one, two and three'
     expect(dOne.name).toBe('dependency one')
     expect(dTwo('test')).toBe('dependency three test')
+    expect(dThree.name).toBe('dependency three')
   }
 
-  DependsUpon.$dependencies = ['test9_dependency_one', 'test9_dependency_two']
-
   cluster.register('test9_dependency_one', DependencyOne, Cluster.Instance)
-  cluster.register('test9_dependency_three', DependencyThree, Cluster.Instance)
   cluster.register('test9_dependency_two', DependencyTwo)
+  cluster.register('test9_dependency_three', DependencyThree, Cluster.Instance)
 
-  cluster.register('test9_depends_upon', DependsUpon, Cluster.Instance)
+  cluster.register('test9_depends_upon', DependsUpon, {
+    type: Cluster.Instance,
+    dependencies: [
+      'test9_dependency_one',
+      'test9_dependency_two',
+      'test9_dependency_three',
+    ],
+  })
 
   expect(cluster.resolve('test9_depends_upon').name).toBe(
-    'depends upon one and two'
+    'depends upon one, two and three'
   )
 })
 
@@ -148,10 +153,16 @@ test('it should apply arguments that are not dependencies when creating an Insta
     expect(this.greeting).toBe('hello ' + name)
   }
 
-  Email.$dependencies = ['test10_greeting']
-
   cluster.register('test10_greeting', greeting)
-  cluster.register('test10_email', Email, Cluster.Instance, 'folkert')
+  cluster.register(
+    'test10_email',
+    Email,
+    {
+      type: Cluster.Instance,
+      dependencies: ['test10_greeting'],
+    },
+    'folkert'
+  )
 
   expect(cluster.resolve('test10_email').greeting).toBe('hello folkert')
 })
