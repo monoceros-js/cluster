@@ -185,6 +185,21 @@ Register new entity with name.
 
 - `...args` <sup>(optional)</sup> - Any arguments you want a function / class entity to be called with upon calling resolve
 
+#### Interchanging the options object
+
+if only passing _dependencies_ ór _entity type_, the options object can be interchanged for directly passing the dependency array or the entity type.
+
+```js
+// only passing type
+cluster.register(name1, entity1, Cluster.Singleton)
+
+// only passing dependencies
+cluster.register(name2, entity2, ['dependency'])
+
+// passing both
+cluster.register(name3, entity3, { type: Cluster.Instance, dependencies: ['dependency'] })
+```
+
 ### Resolve
 
 > (name, [, ...arguments])
