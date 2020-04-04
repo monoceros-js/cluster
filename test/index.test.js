@@ -58,25 +58,35 @@ test('it should take type as replacement for options object', () => {
   expect(cluster.resolve('test5').name).toBe('instance of entity')
 })
 
+test('it should take dependencies as replacement for options object', () => {
+  const one = (a, b) => a + b
+  const two = (add, a, b, c) => add(a, b) * c
+
+  cluster.register('test6_one', one)
+  cluster.register('test6_two', two, ['test6_one'])
+
+  expect(cluster.resolve('test6_two', 1, 2, 3)()).toBe(9)
+})
+
 test('it should take dependencies as property of options object', () => {
   const one = (a, b) => a + b
   const two = (add, a, b, c) => add(a, b) + c
 
-  cluster.register('test6_two', two, { dependencies: ['test6_one'] })
-  cluster.register('test6_one', one)
+  cluster.register('test7_two', two, { dependencies: ['test7_one'] })
+  cluster.register('test7_one', one)
 
-  expect(cluster.resolve('test6_two')(1, 2, 3)).toBe(6)
+  expect(cluster.resolve('test7_two')(1, 2, 3)).toBe(6)
 })
 
 test('it should take dependencies as property of entity', () => {
   const one = (a, b) => a + b
   const two = (add, a, b, c) => add(a, b) + c
-  two.$dependencies = ['test7_one']
+  two.$dependencies = ['test8_one']
 
-  cluster.register('test7_two', two)
-  cluster.register('test7_one', one)
+  cluster.register('test8_two', two)
+  cluster.register('test8_one', one)
 
-  expect(cluster.resolve('test7_two')(1, 2, 3)).toBe(6)
+  expect(cluster.resolve('test8_two')(1, 2, 3)).toBe(6)
 })
 
 test('it should not register own entities in parent cluster', () => {
@@ -84,9 +94,9 @@ test('it should not register own entities in parent cluster', () => {
 
   const add = (a, b) => a + b
 
-  child.register('test8', add)
+  child.register('test9', add)
 
-  expect(() => cluster.resolve('test8')).toThrow()
+  expect(() => cluster.resolve('test9')).toThrow()
 })
 
 test('it should resolve parent-registered entities from parent cluster', () => {
@@ -94,9 +104,9 @@ test('it should resolve parent-registered entities from parent cluster', () => {
 
   const add = (a, b) => a + b
 
-  cluster.register('test9', add)
+  cluster.register('test10', add)
 
-  expect(child.resolve('test9')).toBe(add)
+  expect(child.resolve('test10')).toBe(add)
 })
 
 test('it should let clusters return requested entity from own entities if it is self-registered', () => {
@@ -108,11 +118,11 @@ test('it should let clusters return requested entity from own entities if it is 
   }
   const child = cluster.createCluster()
 
-  cluster.register('test10', entityOne)
-  child.register('test10', entityTwo)
+  cluster.register('test11', entityOne)
+  child.register('test11', entityTwo)
 
-  const resultOne = cluster.resolve('test10')
-  const resultTwo = child.resolve('test10')
+  const resultOne = cluster.resolve('test11')
+  const resultTwo = child.resolve('test11')
 
   expect(resultOne).toBe(entityOne)
   expect(resultTwo).toBe(entityTwo)
@@ -140,16 +150,16 @@ test('it should recursively resolve entity dependencies', () => {
     expect(d3.name).toBe('dependency three')
   }
 
-  cluster.register('test11_one', one, Cluster.Instance)
-  cluster.register('test11_two', two, { dependencies: ['test11_three'] })
-  cluster.register('test11_three', three, Cluster.Instance)
+  cluster.register('test12_one', one, Cluster.Instance)
+  cluster.register('test12_two', two, { dependencies: ['test12_three'] })
+  cluster.register('test12_three', three, Cluster.Instance)
 
-  cluster.register('test11_four', four, {
+  cluster.register('test12_four', four, {
     type: Cluster.Instance,
-    dependencies: ['test11_one', 'test11_two', 'test11_three'],
+    dependencies: ['test12_one', 'test12_two', 'test12_three'],
   })
 
-  expect(cluster.resolve('test11_four').name).toBe(
+  expect(cluster.resolve('test12_four').name).toBe(
     'depends upon one, two and three'
   )
 })
@@ -168,19 +178,19 @@ test('it should apply arguments that are not dependencies when registering an in
     this.greeting = `${d1(d2())}. passed: "${argument}"`
   }
 
-  cluster.register('test12_one', one)
-  cluster.register('test12_two', two, null, 'monoceros')
+  cluster.register('test13_one', one)
+  cluster.register('test13_two', two, null, 'monoceros')
   cluster.register(
-    'test12_three',
+    'test13_three',
     three,
     {
       type: Cluster.Instance,
-      dependencies: ['test12_one', 'test12_two'],
+      dependencies: ['test13_one', 'test13_two'],
     },
     'parameter'
   )
 
-  expect(cluster.resolve('test12_three').greeting).toBe(
+  expect(cluster.resolve('test13_three').greeting).toBe(
     'hello monoceros. passed: "parameter"'
   )
 })
@@ -190,20 +200,31 @@ test('it should correctly resolve overwritten entities', () => {
     add: (a, b) => a + b,
   }
 
-  cluster.register('test13', entity)
+  cluster.register('test14', entity)
 
   entity.add = (a, b) => a - b
 
-  expect(cluster.resolve('test13').add(1, 2)).toBe(-1)
+  expect(cluster.resolve('test14').add(1, 2)).toBe(-1)
 })
 
 test('it should apply extra arguments passed to register to entity on resolve', () => {
   const add = (a, b) => a + b
 
-  cluster.register('add', add)
-  cluster.register('three', add, {}, 1, 2)
+  cluster.register('test15_one', add)
+  cluster.register('test15_two', add, {}, 1, 2)
 
-  expect(cluster.resolve('add', 1, 2)()).toBe(3)
-  expect(cluster.resolve('add')(1, 2)).toBe(3)
-  expect(cluster.resolve('three')('something', 'else')).toBe(3)
+  expect(cluster.resolve('test15_one', 1, 2)()).toBe(3)
+  expect(cluster.resolve('test15_one')(1, 2)).toBe(3)
+  expect(cluster.resolve('test15_two')('something', 'else')).toBe(3)
+})
+
+test('it should apply extra object arguments passed to resolve', () => {
+  const one = (a, b) => a.one + b.one
+
+  cluster.register('test16_one', one)
+  cluster.register('test16_two', one, null, { one: 1 }, { one: 2 })
+
+  expect(cluster.resolve('test16_one', { one: 1 }, { one: 2 })()).toBe(3)
+  expect(cluster.resolve('test16_one')({ one: 1 }, { one: 2 })).toBe(3)
+  expect(cluster.resolve('test16_two')('something', 'else')).toBe(3)
 })

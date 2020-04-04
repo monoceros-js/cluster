@@ -4,6 +4,9 @@ var isInfinite = function isInfinite(cluster) {
 var isFunction = function isFunction(value) {
   return typeof value === 'function';
 };
+var isArray = function isArray(value) {
+  return Array.isArray(value);
+};
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -167,10 +170,21 @@ function Cluster(parent) {
   this.entities = {};
 
   this.register = function (name, entity, options) {
-    if (options && isFunction(options)) {
-      options = {
-        type: options
-      };
+    if (!name) throw new MonocerosClusterError('Entity name must be provided');
+    if (!entity) throw new MonocerosClusterError("Could not find entity trying to be registered as ".concat(name));
+
+    if (options) {
+      if (isFunction(options)) {
+        options = {
+          type: options
+        };
+      }
+
+      if (isArray(options)) {
+        options = {
+          dependencies: options
+        };
+      }
     }
 
     options = options || {};
@@ -194,6 +208,10 @@ function Cluster(parent) {
   this.resolve = function (name) {
     for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
       args[_key2 - 1] = arguments[_key2];
+    }
+
+    if (!name) {
+      throw new MonocerosClusterError('Resolve requires the name of an entity to resolve');
     }
 
     args = args || [];

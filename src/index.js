@@ -1,4 +1,4 @@
-import { isInfinite, isFunction } from './utils/value'
+import { isInfinite, isFunction, isArray } from './utils/value'
 import { MonocerosClusterError } from './errors'
 
 function Cluster(parent) {
@@ -6,8 +6,18 @@ function Cluster(parent) {
   this.entities = {}
 
   this.register = function (name, entity, options, ...args) {
-    if (options && isFunction(options)) {
-      options = { type: options }
+    if (!name) throw new MonocerosClusterError('Entity name must be provided')
+    if (!entity)
+      throw new MonocerosClusterError(
+        `Could not find entity trying to be registered as ${name}`
+      )
+    if (options) {
+      if (isFunction(options)) {
+        options = { type: options }
+      }
+      if (isArray(options)) {
+        options = { dependencies: options }
+      }
     }
     options = options || {}
     this.entities[name] = {
@@ -23,6 +33,11 @@ function Cluster(parent) {
   }
 
   this.resolve = function (name, ...args) {
+    if (!name) {
+      throw new MonocerosClusterError(
+        'Resolve requires the name of an entity to resolve'
+      )
+    }
     args = args || []
     if (this.entities.hasOwnProperty(name)) {
       return this.applyEntityType(name, args).resolve()
